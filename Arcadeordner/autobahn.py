@@ -1,6 +1,8 @@
 import pygame
 import sys
 import random
+import os
+import subprocess
 Breite=800
 Höhe=600
 Weiß=(255,255,255)
@@ -27,7 +29,9 @@ class Hintergrund:
                 pygame.draw.rect(screen, self.straßenmakierung, (x,y-2,20,4))
 class Spieler:
      def __init__(self):
-        self.auto=pygame.image.load("Grafiken/auto1.png").convert_alpha()
+        dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
+        pfad_grafik1 = os.path.join(dir_path,"Grafiken", "auto1.png") 
+        self.auto=pygame.image.load(pfad_grafik1).convert_alpha()
         self.auto=pygame.transform.scale(self.auto, (80,80))
         self.rect=self.auto.get_rect()
         self.rect.inflate_ip(-20,-20)
@@ -51,7 +55,10 @@ class Hinderniss:
         self.spurhöhe=(Höhe-200)//3
         self.spur=random.randint(0,2)
         self.y_pos=100+self.spur*self.spurhöhe+(self.spurhöhe-80)//2
-        autos=["Grafiken/auto2.png","Grafiken/LKW1.png"]
+        dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
+        pfad_grafik2 = os.path.join(dir_path,"Grafiken", "auto2.png")
+        pfad_grafik3 = os.path.join(dir_path,"Grafiken", "LKW1.png")  
+        autos=[pfad_grafik2, pfad_grafik3]
         autoauswahl=random.choice(autos)
         self.auto2=pygame.image.load(autoauswahl).convert_alpha()
         self.auto2=pygame.transform.scale(self.auto2, (80,80))
