@@ -150,7 +150,7 @@ class Optionen(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_optionen = Image(source="optionen_placeholder.jpg")
+        hintergrundbild_optionen = Image(source="GUI_Grafiken\\optionen_placeholder.jpg")
         self.add_widget(hintergrundbild_optionen)
 
         back_button = Button(text = "BACK", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
