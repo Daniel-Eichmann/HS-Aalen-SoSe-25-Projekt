@@ -13,7 +13,7 @@ from kivy.uix.image import Image
 from kivy.uix.slider import Slider
 import subprocess
 import os
-
+#test
 
 
 class MainHauptmenüWidget(Screen):      #Diese Klasse macht aus unseren MainHauptmenü ein Widget, damit es mit dem ScreenManager geändert werden kann!
