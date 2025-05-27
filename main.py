@@ -33,7 +33,7 @@ class MainHauptmenü(FloatLayout):        #Für das Layout Verwantwortlich. Ist 
         #Button1
         def go_to_spiel_starten(click):
             self.parent.manager.current ="spiel_starten"
-        spiel_starten_button = Button(text ="SPIEL STARTEN", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        spiel_starten_button = Button(text ="SPIEL STARTEN", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         spiel_starten_button.size_hint = 0.3, 0.1
         spiel_starten_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.75}
         self.add_widget(spiel_starten_button)
@@ -42,7 +42,7 @@ class MainHauptmenü(FloatLayout):        #Für das Layout Verwantwortlich. Ist 
         #Button 2
         def go_to_highscore(click):
             self.parent.manager.current ="highscore"
-        highscore_button = Button(text ="HIGHSCORE", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        highscore_button = Button(text ="HIGHSCORE", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         highscore_button.size_hint = 0.3 , 0.1
         highscore_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.55}
         self.add_widget(highscore_button)
@@ -51,7 +51,7 @@ class MainHauptmenü(FloatLayout):        #Für das Layout Verwantwortlich. Ist 
         #Button 3
         def go_to_optionen(click):
             self.parent.manager.current ="optionen"
-        optionen_button = Button(text ="OPTIONEN", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        optionen_button = Button(text ="OPTIONEN", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         optionen_button.size_hint = 0.3 , 0.1
         optionen_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.35}
         self.add_widget(optionen_button)
@@ -60,7 +60,7 @@ class MainHauptmenü(FloatLayout):        #Für das Layout Verwantwortlich. Ist 
         #Button4 
         def go_to_credits(click):
             self.parent.manager.current ="credits"
-        credits_button = Button(text ="CREDITS", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        credits_button = Button(text ="CREDITS", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         credits_button.size_hint = 0.3 , 0.1
         credits_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.15}
         self.add_widget(credits_button)
@@ -84,7 +84,7 @@ class Spiel_Starten(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_spiel_starten = Image(source="spiel_starten_placeholder.jpg")
+        hintergrundbild_spiel_starten = Image(source="GUI_Grafiken\\spiel_starten_placeholder.jpg")
         self.add_widget(hintergrundbild_spiel_starten)
         
         def arcade_grundlagen_starten(click):                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
@@ -98,19 +98,19 @@ class Spiel_Starten(FloatLayout):
             subprocess.run(["python", pfad_spiel2])
 
 
-        spiel1 = Button(text ="SPIEL 1", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        spiel1 = Button(text ="SPIEL 1", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         spiel1.size_hint = 0.3, 0.1
         spiel1.pos_hint = {"center_x" : 0.28, "center_y" : 0.75}
         self.add_widget(spiel1)
         spiel1.bind(on_press = arcade_grundlagen_starten)
 
-        spiel2 = Button(text ="SPIEL 2", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        spiel2 = Button(text ="SPIEL 2", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         spiel2.size_hint = 0.3, 0.1
         spiel2.pos_hint = {"center_x" : 0.28, "center_y" : 0.55}
         self.add_widget(spiel2)
         spiel2.bind(on_press = alien_invasion_starten)
 
-        back_button = Button(text = "BACK", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
         back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
         back_button.bind(on_press = back_button_click1)
@@ -128,10 +128,10 @@ class Credits(FloatLayout):
         def back_button_click(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_credits = Image(source="credits_placeholder.jpg")
+        hintergrundbild_credits = Image(source="GUI_Grafiken\\credits_placeholder.jpg")
         self.add_widget(hintergrundbild_credits)
 
-        back_button = Button(text = "BACK", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
         back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
         back_button.bind(on_press = back_button_click)
@@ -153,7 +153,7 @@ class Optionen(FloatLayout):
         hintergrundbild_optionen = Image(source="GUI_Grafiken\\optionen_placeholder.jpg")
         self.add_widget(hintergrundbild_optionen)
 
-        back_button = Button(text = "BACK", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
         back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
         back_button.bind(on_press = back_button_click1)
@@ -171,10 +171,10 @@ class Highscore(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_highscore = Image(source="highscore_placeholder.jpg")
+        hintergrundbild_highscore = Image(source="GUI_Grafiken\\highscore_placeholder.jpg")
         self.add_widget(hintergrundbild_highscore)
 
-        back_button = Button(text = "BACK", font_name="ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
         back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
         back_button.bind(on_press = back_button_click1)
@@ -182,7 +182,7 @@ class Highscore(FloatLayout):
 
 class ArcadeProjektApp(App):           #Startet das Main Fenster unserer App
     def build(self):
-        self.music = SoundLoader.load("hintergrund_musik1.mp3")
+        self.music = SoundLoader.load("GUI_Grafiken\\hintergrund_musik1.mp3")
         if self.music:
             self.music.loop = True
             self.music.play()
