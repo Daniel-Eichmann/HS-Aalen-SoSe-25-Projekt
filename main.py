@@ -90,7 +90,7 @@ class Spiel_Starten(FloatLayout):
         
         def arcade_grundlagen_starten(click):                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
-            pfad_spiel1 = os.path.join(dir_path,"Spiel_Eins", "arcade_grundlagen.py")                          
+            pfad_spiel1 = os.path.join(dir_path,"Arcadeordner", "autobahn.py")                          
             subprocess.run(["python", pfad_spiel1])
 
         def alien_invasion_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
