@@ -57,8 +57,9 @@ class Hinderniss:
         self.y_pos=100+self.spur*self.spurhöhe+(self.spurhöhe-80)//2
         dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
         pfad_grafik2 = os.path.join(dir_path,"Grafiken", "auto2.png")
-        pfad_grafik3 = os.path.join(dir_path,"Grafiken", "LKW1.png")  
-        autos=[pfad_grafik2, pfad_grafik3]
+        pfad_grafik3 = os.path.join(dir_path,"Grafiken", "LKW1.png")
+        pfad_grafik4 = os.path.join(dir_path,"Grafiken", "Bus1.png")  
+        autos=[pfad_grafik2, pfad_grafik3, pfad_grafik4]
         autoauswahl=random.choice(autos)
         self.auto2=pygame.image.load(autoauswahl).convert_alpha()
         self.auto2=pygame.transform.scale(self.auto2, (80,80))
