@@ -54,19 +54,15 @@ class Player:
         
         if self.player_position_y > fensterhöhe - self.player_höhe:
             self.player_position_y = fensterhöhe - self.player_höhe
-        
 
-        
-
-
-    
     def draw(self):
         pygame.draw.rect(screen, self.player_farbe, [self.player_position_x, self.player_position_y, self.player_breite, self.player_höhe])
 
 
 def main():
     ball = Ball(320, 240, 20, weiss, 4, 4)
-    player = Player(100, 100, 20, 40, rot, 1)
+    player1 = Player(100, 100, 20, 60, rot, 0)
+    player2 = Player(540, 100, 20, 60, weiss, 0)
     spielaktiv = True
 
     while spielaktiv:
@@ -74,12 +70,35 @@ def main():
             if event.type == pygame.QUIT:
                 spielaktiv = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    player1.player_bewegung_y = -5
+                if event.key == pygame.K_s:
+                    player1.player_bewegung_y = 5
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_w or event.key == pygame.K_s:
+                    player1.player_bewegung_y = 0
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    player2.player_bewegung_y = -5
+                if event.key == pygame.K_k:
+                    player2.player_bewegung_y = 5
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_i or event.key == pygame.K_k:
+                    player2.player_bewegung_y = 0
+
         screen.fill(schwarz)
 
         ball.bewegung()
         ball.draw()
 
-        player.draw()
+        player1.bewegung()
+        player1.draw()
+        player2.bewegung()
+        player2.draw()
 
         pygame.display.flip()
         clock.tick(60)
