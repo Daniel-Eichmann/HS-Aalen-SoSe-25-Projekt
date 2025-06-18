@@ -5,6 +5,7 @@ import os
 import subprocess
 Breite=800
 Höhe=600
+#Farben
 Weiß=(255,255,255)
 Schwarz=(0,0,0)
 Rot=(255,0,0)
@@ -40,9 +41,9 @@ class Spieler:
         self.rect.topleft=(100, start_y)
         self.speed=5
      def bewegen(self, keys):
-        if keys [pygame.K_UP] and self.rect.top >0:
+        if keys [pygame.K_UP] and self.rect.top >100:
             self.rect.y-=self.speed
-        if keys[pygame.K_DOWN] and self.rect.bottom<Höhe:
+        if keys[pygame.K_DOWN] and self.rect.bottom<Höhe-100:
             self.rect.y+=self.speed
         if keys [pygame.K_LEFT] and self.rect.left>0:
             self.rect.x-=self.speed
@@ -50,6 +51,7 @@ class Spieler:
             self.rect.x +=self.speed
      def draw(self, screen):
                 screen.blit(self.auto, self.rect)
+                pygame.draw.rect(screen,(0,255,0),self.rect, 2)
 class Hinderniss:
     def __init__(self):
         self.spurhöhe=(Höhe-200)//3
@@ -105,10 +107,15 @@ class Game:
         for hinderniss in self.hinderniss:
             hinderniss.update()
             if self.player.rect.colliderect(hinderniss.rect):
-                print("Berührung! Game Over")
                 self.speichere_highscore()
+                self.gameover()
                 self.running=False
-        self.hinderniss=[hinderniss for hinderniss in self.hinderniss if hinderniss.rect.right>0]
+        neueliste=[]
+        for hinderniss in self.hinderniss:
+            hinderniss.update()
+            if hinderniss.rect.right>0:
+                neueliste.append(hinderniss)
+                self.hinderniss=neueliste
         self.score+=1
     def draw(self):
         self.background.draw(self.screen)
@@ -129,7 +136,14 @@ class Game:
     def speichere_highscore(self):
         if self.score>self.highscore:
             with open("highscore.txt", "w") as f:
-                f.write(str(self.score))    
+                f.write(str(self.score))  
+    def gameover(self):
+        self.screen.fill(Schwarz)
+        gameoveranzeigen=self.font.render("GAME OVER,", True, Rot)
+        textposition=gameoveranzeigen.get_rect(center=(Breite//2, Höhe//2))
+        self.screen.blit(gameoveranzeigen, textposition)
+        pygame.display.flip()
+        pygame.time.delay(3000)
 if __name__=="__main__":
     Game().run()
 
