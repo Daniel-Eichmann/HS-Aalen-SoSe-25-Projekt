@@ -3,6 +3,7 @@ import serial
 import serial.tools.list_ports
 import random
 import math
+import time
 
 pygame.init()
 
@@ -91,7 +92,7 @@ class Ball:
             x = math.cos(winkel)
             y = math.sin(winkel)
 
-            if 0.4 < abs(x) < 0.95:
+            if abs(x) > 0.85 and abs(y)< 0.5:
                 break
 
         self.ball_bewegung_x = geschwindigkeit * x
@@ -125,6 +126,35 @@ class Player:
     def draw(self):
         pygame.draw.rect(screen, self.player_farbe, [self.player_position_x, self.player_position_y, self.player_breite, self.player_höhe])
 
+class Gegner(Player):
+    def __init__(self, player_position_x, player_position_y, player_breite, player_höhe, player_farbe, player_bewegung_y, ball):
+        super().__init__(player_position_x, player_position_y, player_breite, player_höhe, player_farbe, player_bewegung_y)
+        self.ball = ball
+        self.reaktionszeit = 0
+        self.zeit_letzte_reaktion = time.time()
+        self.reaktions_delay = random.uniform(0.05, 0.3)
+        
+    
+    def bewegung(self):
+        aktuelle_zeit = time.time()
+
+        if aktuelle_zeit - self.zeit_letzte_reaktion < self.reaktions_delay:
+            self.player_bewegung_y = 0
+        else:
+            self.zeit_letzte_reaktion = aktuelle_zeit
+            self.reaktions_delay = random.uniform(0.1, 0.4)
+
+        if random.random() < 0.1:
+            self.player_bewegung_y = 0
+        else:
+            if self.ball.ball_position_y < self.player_position_y:
+                self.player_bewegung_y = -4
+            elif self.ball.ball_position_y > self.player_position_y + self.player_höhe:
+                self.player_bewegung_y = 4
+            else:
+                self.player_bewegung_y = 0
+        super().bewegung()
+
 class Spielstand:
     def __init__(self, font_size=50, font_color=(0, 0, 0)):
         self.punkte_player1 = 0
@@ -148,21 +178,6 @@ class Spielstand:
         self.punkte_player1 = 0
         self.punkte_player2 = 0
 
-class Gegner(Player):
-    def __init__(self, player_position_x, player_position_y, player_breite, player_höhe, player_farbe, player_bewegung_y, ball):
-        super().__init__(player_position_x, player_position_y, player_breite, player_höhe, player_farbe, player_bewegung_y)
-        self.ball = ball
-    
-    def bewegung(self):
-        
-        if self.ball.ball_position_y < self.player_position_y:
-            self.player_bewegung_y = -4
-        elif self.ball.ball_position_y > self.player_position_y + self.player_höhe:
-            self.player_bewegung_y = 4
-        else:
-            self.player_bewegung_y = 0
-        super().bewegung()
-
 class Maingame:
     def __init__(self):
         self.ball = Ball(320, 240, 20, weiss, 0, 0)
@@ -180,27 +195,35 @@ class Maingame:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                elif event.key == pygame.K_w:
                     self.tastatur_player1 = -4
                 elif event.key == pygame.K_s:
                     self.tastatur_player1 = 4
-                elif event.key == pygame.K_i:
+                elif event.key == pygame.K_a:
                     self.tastatur_player2 = -4
-                elif event.key == pygame.K_k:
+                elif event.key == pygame.K_d:
                     self.tastatur_player2 = 4
             elif event.type == pygame.KEYUP:
                 if event.key in (pygame.K_w, pygame.K_s):
                     self.tastatur_player1 = 0
-                if event.key in (pygame.K_i, pygame.K_k):
+                if event.key in (pygame.K_a, pygame.K_d):
                     self.tastatur_player2 = 0
     
     def raspberry_input(self):
         line = self.raspberry.readline()
         if line:
             try:
-                w, s, i, k = map(int, line.split(','))
+                w, s, a, d, escape, enter = map(int, line.split(','))
                 self.player1.player_bewegung_y = -5 if w else (5 if s else 0)
-                self.player2.player_bewegung_y = -5 if i else (5 if k else 0)
+                self.gegner.player_bewegung_y = -5 if a else (5 if d else 0)
+
+                if escape:
+                    self.running = False
+                if enter:
+                    return None
+ 
             except Exception as e:
                 return None
         else:
@@ -222,20 +245,53 @@ class Maingame:
         if self.ball.ball_position_x < 0:
             self.spielstand.player2_punkt()
             self.ball.reset()
+            self.player1.reset()
+            self.gegner.reset()
+            pygame.time.delay(500)
 
         if self.ball.ball_position_x > fensterbreite - self.ball.ball_durchmesser:
             self.spielstand.player1_punkt()
             self.ball.reset()
+            self.player1.reset()
+            self.gegner.reset()
+            pygame.time.delay(500)
     
     def check_win(self):
         if self.spielstand.punkte_player1 >= 5 or self.spielstand.punkte_player2 >=5:
             gewinner_text = "Spieler 1 hat Gewonnen!" if self.spielstand.punkte_player1 >=5 else "Spieler 2 hat Gewonnen"
             font = pygame.font.SysFont(None, 60)
             text_surface = font.render(gewinner_text, True, schwarz)
+            kleinere_schrift = pygame.font.SysFont(None, 30)
             screen.fill(weiss)
             screen.blit(text_surface, (fensterbreite // 2 - text_surface.get_width() // 2, fensterhöhe // 2 -30))
+            hinweis = kleinere_schrift.render("Drücke Enter zum Weiterspielen", True, schwarz)
+            screen.blit(hinweis, (fensterbreite // 2 - hinweis.get_width() // 2, fensterhöhe // 2 + 30))
             pygame.display.flip()
-            pygame.time.delay(3000)
+            warten = True
+            while warten:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                        return
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        warten = False
+                    elif event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        return
+                line = self.raspberry.readline()
+                if line:
+                    try:
+                        w, s, a ,d, escape, enter = map(int, line.split(','))
+                        if escape:
+                            self.running = False
+                            return
+                        if enter:
+                            warten = False
+                    except:
+                        pass
+
+
+            
             self.spielstand.reset()
             self.ball.reset()
             self.player1.reset()
@@ -268,9 +324,6 @@ class Maingame:
         self.raspberry.close()
         pygame.quit()
 
-
-
-                                 
 def main():
     maingame = Maingame()
     maingame.run()
