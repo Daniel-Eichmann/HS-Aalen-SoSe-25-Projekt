@@ -5,6 +5,12 @@ import os
 import subprocess
 Breite=800
 Höhe=600
+pygame.mixer.init()
+dir_path = os.path.dirname(os.path.realpath(__file__))
+levelxsound = os.path.join(dir_path,"Grafiken", "levelx.mp3")
+pygame.mixer.music.load(levelxsound)
+pygame.mixer.music.set_volume(1.0)
+pygame.mixer.music.play(-1)
 #Farben
 Weiß=(255,255,255)
 Schwarz=(0,0,0)
@@ -110,6 +116,7 @@ class Game:
                 self.speichere_highscore()
                 self.gameover()
                 self.running=False
+        #nur sichtbare Autos updaten
         neueliste=[]
         for hinderniss in self.hinderniss:
             hinderniss.update()

@@ -85,20 +85,25 @@ class Game:
         self.screen=pygame.display.set_mode((BREITE, HOEHE))
         pygame.display.set_caption("Labyrinthspiel")
         self.clock=pygame.time.Clock()
+        self.font=pygame.font.SysFont(None, 40)
         self.map=Map(ROWS, COLS)
         self.spieler=Spieler(self.map)
         self.gegner=Gegner(self.map)
+        self.running=True
+        self.startzeit=pygame.time.get_ticks()
+        self.lebenszeit=0
     def run(self):
-        while True:
+        while self.running:
             self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
+        self.game_over()
     def events(self):
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
-                sys.exit
+                sys.exit()
         keys=pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.spieler.bewegen(-1,0)
@@ -110,12 +115,38 @@ class Game:
             self.spieler.bewegen(0,1)
     def update(self):
         self.gegner.update((self.spieler.x, self.spieler.y))
+        if self.gegner.x==self.spieler.x and self.gegner.y ==self.spieler.y:
+            self.lebenszeit=(pygame.time.get_ticks()-self.startzeit)//1000
+            self.running=False
     def draw(self):
         self.screen.fill(SCHWARZ)
         self.map.draw(self.screen)
         self.spieler.draw(self.screen)
         self.gegner.draw(self.screen)
+        aktuelle_zeit=(pygame.time.get_ticks()-self.startzeit)//1000
+        timertxt=self.font.render(f"Zeit: {aktuelle_zeit}s", True, (255,255,0))
+        self.screen.blit(timertxt, (10, 10))
         pygame.display.flip()
+    def game_over(self):
+        self.screen.fill(SCHWARZ)
+        text1=self.font.render("Game Over!", True, ROT)
+        text2=self.font.render(f"Überlebt: {self.lebenszeit} Sekunden", True, WEISS)
+        text3=self.font.render("Zum beenden beliebige Taste drücken...", True, GRAU)
+        self.screen.blit(text1, (BREITE//2-text1.get_width()//2, HOEHE//2-60))
+        self.screen.blit(text2, (BREITE//2-text2.get_width()//2, HOEHE//2))
+        self.screen.blit(text3, (BREITE//2-text3.get_width()//2, HOEHE//2+40))
+        pygame.display.flip()
+        warten=True
+        while warten:
+            for event in pygame.event.get():
+                if event.type==pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type==pygame.KEYDOWN:
+                    warten=False
+        pygame.quit()
+        sys.exit()
+
 if __name__=="__main__":
     Game().run()
 
