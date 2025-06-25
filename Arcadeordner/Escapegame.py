@@ -2,6 +2,8 @@ import pygame
 import random
 import sys 
 from collections import deque
+import serial
+import serial.tools.list_ports
 titelgröße=30
 ROWS=20
 COLS=20
@@ -14,6 +16,45 @@ SCHWARZ=(0,0,0)
 GRUEN=(0,200,0)
 ROT=(200,0,0)
 GRAU=(200,200,200)
+class Raspberry:
+    def __init__ (self, baudrate=9600, timeout=0.1):
+        self.port = self.get_com_port()
+        self.ser = None 
+        if self.port:
+            try:
+                self.ser = serial.Serial(self.port, baudrate, timeout=timeout)
+            except Exception as e:
+                self.ser = None
+    
+    def get_com_port(self):
+        ports = list(serial.tools.list_ports.comports())
+        com_ports = []
+
+        for p in ports:
+            if p.device.startswith('COM'):
+                try:
+                    num = int(p.device[3:])
+                    com_ports.append((num, p.device))
+                except ValueError:
+                    pass
+        if not com_ports:
+            return None
+        
+        com_ports.sort(key=lambda x: x[0], reverse=True)
+        return com_ports[0][1]
+    
+    def readline(self):
+        if self.ser and self.ser.in_waiting:
+            try:
+                line = self.ser.readline().decode().strip()
+                return line
+            except Exception as e:
+                return None
+        return None
+    
+    def close(self):
+        if self.ser:
+            self.ser.close()
 class Map:
     def __init__(self, rows, cols):
         self.rows=rows
@@ -90,12 +131,14 @@ class Game:
         self.spieler=Spieler(self.map)
         self.gegner=Gegner(self.map)
         self.running=True
+        self.tastatur_player1=(0,0)
+        self.raspberry = Raspberry()
         self.startzeit=pygame.time.get_ticks()
         self.lebenszeit=0
     def run(self):
         while self.running:
             self.clock.tick(FPS)
-            self.events()
+            self.input_handling()
             self.update()
             self.draw()
         self.game_over()
@@ -104,16 +147,45 @@ class Game:
             if event.type==pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        keys=pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.spieler.bewegen(-1,0)
-        if keys[pygame.K_RIGHT]:
-            self.spieler.bewegen(1,0)
-        if keys[pygame.K_UP]:
-            self.spieler.bewegen(0,-1)
-        if keys[pygame.K_DOWN]:
-            self.spieler.bewegen(0,1)
+    def input_handling(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                elif event.key == pygame.K_w:
+                    self.tastatur_player1 = (0, -1)
+                elif event.key == pygame.K_s:
+                    self.tastatur_player1 = (0,1)
+                elif event.key == pygame.K_a:
+                    self.tastatur_player1 = (-1,0)
+                elif event.key == pygame.K_d:
+                    self.tastatur_player1 = (1,0)
+            elif event.type == pygame.KEYUP:
+                if event.key in (pygame.K_w, pygame.K_s):
+                    self.tastatur_player1 = (0,0)
+                if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
+                    self.tastatur_player2 = (0,0)
+    
+    def raspberry_input(self):
+        line = self.raspberry.readline()
+        if line:
+            try:
+                w, s, a, d, escape, enter = map(int, line.split(','))
+                dx = -1 if a else (1 if d else 0)
+                dy = -1 if w else (1 if s else 0)
+                self.tastatur_player1=(dx, dy)
+
+                if escape:
+                    self.running = False
+ 
+            except Exception as e:
+                pass
     def update(self):
+        if isinstance(self.tastatur_player1, tuple):
+            dx, dy=self.tastatur_player1
+            self.spieler.bewegen(dx,dy)
         self.gegner.update((self.spieler.x, self.spieler.y))
         if self.gegner.x==self.spieler.x and self.gegner.y ==self.spieler.y:
             self.lebenszeit=(pygame.time.get_ticks()-self.startzeit)//1000
@@ -146,7 +218,9 @@ class Game:
                     warten=False
         pygame.quit()
         sys.exit()
-
+def main():
+    maingame = Game()
+    maingame.run()
 if __name__=="__main__":
     Game().run()
 
