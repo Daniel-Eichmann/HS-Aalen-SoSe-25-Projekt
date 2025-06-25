@@ -4,6 +4,7 @@ import sys
 from collections import deque
 import serial
 import serial.tools.list_ports
+#import highscore_manager 
 titelgröße=30
 ROWS=20
 COLS=20
@@ -163,10 +164,8 @@ class Game:
                 elif event.key == pygame.K_d:
                     self.tastatur_player1 = (1,0)
             elif event.type == pygame.KEYUP:
-                if event.key in (pygame.K_w, pygame.K_s):
-                    self.tastatur_player1 = (0,0)
                 if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
-                    self.tastatur_player2 = (0,0)
+                    self.tastatur_player1 = (0,0)
     
     def raspberry_input(self):
         line = self.raspberry.readline()
@@ -200,6 +199,11 @@ class Game:
         self.screen.blit(timertxt, (10, 10))
         pygame.display.flip()
     def game_over(self):
+        #benutzername=input("Benutzername:")
+        #highscore_manager.speichere_highscore("Labyrinthspiel", benutzername, self.lebenszeit)
+        #print("\nTrophy Highscores:")
+        #for eintrag in highscore_manager.zeige_highscore("Labyrinthspiel"):
+        #    print(f"{eintrag['name']:10}-{eintrag['zeit']}s")
         self.screen.fill(SCHWARZ)
         text1=self.font.render("Game Over!", True, ROT)
         text2=self.font.render(f"Überlebt: {self.lebenszeit} Sekunden", True, WEISS)

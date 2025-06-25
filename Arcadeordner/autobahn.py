@@ -3,6 +3,8 @@ import sys
 import random
 import os
 import subprocess
+import serial
+import serial.tools.list_ports
 Breite=800
 Höhe=600
 pygame.mixer.init()
