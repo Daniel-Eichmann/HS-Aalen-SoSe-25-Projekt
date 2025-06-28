@@ -89,28 +89,39 @@ class Spiel_Starten(FloatLayout):
         hintergrundbild_spiel_starten = Image(source="GUI_Grafiken\\spiel_starten_placeholder.jpg")
         self.add_widget(hintergrundbild_spiel_starten)
         
-        def arcade_grundlagen_starten(click):                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_autobahn_starten(click):                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel1 = os.path.join(dir_path,"Arcadeordner", "autobahn.py")                          
             subprocess.run(["python", pfad_spiel1])
 
-        def alien_invasion_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_escapegame_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
-            pfad_spiel2 = os.path.join(dir_path,"Spiel_Zwei", "alien_invasion.py")                          
+            pfad_spiel2 = os.path.join(dir_path,"Arcadeordner", "Escapegame.py")                          
             subprocess.run(["python", pfad_spiel2])
 
+        def arcade_pong_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+            dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
+            pfad_spiel3 = os.path.join(dir_path,"Spiel_Drei", "Pong.py")                          
+            subprocess.run(["python", pfad_spiel3])
 
-        spiel1 = Button(text ="SPIEL 1", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+
+        spiel1 = Button(text ="Autobahn", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         spiel1.size_hint = 0.3, 0.1
         spiel1.pos_hint = {"center_x" : 0.28, "center_y" : 0.75}
         self.add_widget(spiel1)
-        spiel1.bind(on_press = arcade_grundlagen_starten)
+        spiel1.bind(on_press = arcade_autobahn_starten)
 
-        spiel2 = Button(text ="SPIEL 2", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        spiel2 = Button(text ="Escapegame", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         spiel2.size_hint = 0.3, 0.1
         spiel2.pos_hint = {"center_x" : 0.28, "center_y" : 0.55}
         self.add_widget(spiel2)
-        spiel2.bind(on_press = alien_invasion_starten)
+        spiel2.bind(on_press = arcade_escapegame_starten)
+
+        spiel3 = spiel1 = Button(text ="Pong", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        spiel3.size_hint = 0.3, 0.1
+        spiel3.pos_hint = {"center_x" : 0.28, "center_y" : 0.35}
+        self.add_widget(spiel3)
+        spiel3.bind(on_press = arcade_pong_starten)
 
         back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
