@@ -11,6 +11,7 @@ from kivy.uix.video import Video
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
 from kivy.uix.slider import Slider
+from kivy.uix.label import Label
 import subprocess
 import os
 #test -marco
@@ -151,8 +152,58 @@ class Optionen(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_optionen = Image(source="GUI_Grafiken\\optionen_placeholder.jpg")
+        hintergrundbild_optionen = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
+        hintergrundbild_optionen.allow_stretch = True
+        hintergrundbild_optionen.keep_ratio = False
         self.add_widget(hintergrundbild_optionen)
+
+        lautstärke_label = Label(text="Volume", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, color = [1,1,1,1])
+        lautstärke_label.size_hint = 0.3, 0.1
+        lautstärke_label.pos_hint = {"center_x" : 0.28, "center_y" : 0.75}
+        self.add_widget(lautstärke_label)
+
+        lautstärke_slider = Slider(min=0, max=1, value = App.get_running_app().music.volume)
+        lautstärke_slider.size_hint = 0.3, 0.05
+        lautstärke_slider.pos_hint = {"center_x" : 0.28, "center_y" : 0.70}
+        self.add_widget(lautstärke_slider)
+
+        def lautstärke_anpassung(instance, value):
+            App.get_running_app().music.volume = value
+        lautstärke_slider.bind(value = lautstärke_anpassung)
+
+        musik_label = Label(text = "Musikauswahl", font_name="GUI_Grafiken\\ka1.ttf", font_size = 23, color = (1,1,1,1))
+        musik_label.size_hint = 0.3, 0.1
+        musik_label.pos_hint = {"center_x" : 0.28, "center_y" : 0.5}
+        self.add_widget(musik_label)
+
+        def musik_wechsel1(instance):
+            App.get_running_app().musikauswahl("GUI_Grafiken/hintergrund_musik1.mp3")
+        
+        def musik_wechsel2(instance):
+            App.get_running_app().musikauswahl("GUI_Grafiken/hintergrund_musik2.mp3")
+
+        def musik_wechsel3(instance):
+            App.get_running_app().musikauswahl("GUI_Grafiken/hintergrund_musik3.mp3")
+
+        musik1_button = Button(text ="Spaceship Arcade", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        musik1_button.size_hint = 0.3 , 0.1
+        musik1_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.4}
+        musik1_button.bind(on_press = musik_wechsel1)
+        self.add_widget(musik1_button)
+
+        musik2_button = Button(text ="Retro Game Arcade", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        musik2_button.size_hint = 0.3 , 0.1
+        musik2_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.3}
+        musik2_button.bind(on_press = musik_wechsel2)
+        self.add_widget(musik2_button)
+
+        musik3_button = Button(text ="8-bit Arcade Mode", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        musik3_button.size_hint = 0.3 , 0.1
+        musik3_button.pos_hint = {"center_x" : 0.28, "center_y" : 0.2}
+        musik3_button.bind(on_press = musik_wechsel3)
+        self.add_widget(musik3_button)
+
+        
 
         back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         back_button.size_hint = 0.3, 0.1
@@ -186,6 +237,7 @@ class ArcadeProjektApp(App):           #Startet das Main Fenster unserer App
         self.music = SoundLoader.load("GUI_Grafiken\\hintergrund_musik1.mp3")
         if self.music:
             self.music.loop = True
+            self.music.volume = 0.01
             self.music.play()
 
         sm = ScreenManager()
@@ -195,5 +247,14 @@ class ArcadeProjektApp(App):           #Startet das Main Fenster unserer App
         sm.add_widget(HighscoreWidget(name = "highscore"))
         sm.add_widget(Spiel_StartenWidget(name = "spiel_starten"))
         return sm
+    
+    def musikauswahl(self, pfad):
+        if self.music:
+            self.music.stop()
+        self.music = SoundLoader.load(pfad)
+        if self.music:
+            self.music.loop
+            self.music.volume = 0.01
+            self.music.play()
 
 ArcadeProjektApp().run()
