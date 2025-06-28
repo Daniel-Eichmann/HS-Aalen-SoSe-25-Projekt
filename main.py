@@ -12,10 +12,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
 from kivy.uix.slider import Slider
 from kivy.uix.label import Label
+from kivy.clock import Clock
 import subprocess
 import os
-#test -marco
-#tets2kljhertflkwxbbb
 
 
 class MainHauptmenüWidget(Screen):      #Diese Klasse macht aus unseren MainHauptmenü ein Widget, damit es mit dem ScreenManager geändert werden kann!
@@ -86,13 +85,20 @@ class Spiel_Starten(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_spiel_starten = Image(source="GUI_Grafiken\\spiel_starten_placeholder.jpg")
+        hintergrundbild_spiel_starten = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
+        hintergrundbild_spiel_starten.allow_stretch = True
+        hintergrundbild_spiel_starten.keep_ratio = False
         self.add_widget(hintergrundbild_spiel_starten)
         
-        def arcade_autobahn_starten(click):                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_autobahn_starten(click):
+            app = App.get_running_app()
+            if app.music:
+                app.music.volume = 0.0                                                           #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel1 = os.path.join(dir_path,"Arcadeordner", "autobahn.py")                          
             subprocess.run(["python", pfad_spiel1])
+            if app.music:
+                app.music.volume = 0.01
 
         def arcade_escapegame_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                      #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
@@ -243,6 +249,32 @@ class Highscore(FloatLayout):
         back_button.bind(on_press = back_button_click1)
         self.add_widget(back_button)
 
+class Intro1(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+        logo_hs_aalen = Image(source="GUI_Grafiken\\hs_aalen.png", allow_stretch = True, keep_ratio = True)
+        layout.add_widget(logo_hs_aalen)
+        self.add_widget(layout)
+        Clock.schedule_once(self.wechsel_zu_intro2, 2.5)
+    
+    def wechsel_zu_intro2(self, zeit):
+        self.manager.current = "intro2"
+
+class Intro2(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+        logo = Image(source="GUI_Grafiken\\credits_placeholder.jpg", allow_stretch=True, keep_ratio=False)
+        layout.add_widget(logo)
+        self.add_widget(layout)
+        Clock.schedule_once(self.wechsle_zu_hauptmenü, 5)
+
+    def wechsle_zu_hauptmenü(self, zeit):
+        self.manager.current = "hauptmenü"
+        
+
+
 class ArcadeProjektApp(App):           #Startet das Main Fenster unserer App
     def build(self):
         self.music = SoundLoader.load("GUI_Grafiken\\hintergrund_musik1.mp3")
@@ -252,6 +284,8 @@ class ArcadeProjektApp(App):           #Startet das Main Fenster unserer App
             self.music.play()
 
         sm = ScreenManager()
+        sm.add_widget(Intro1(name = "intro1"))
+        sm.add_widget(Intro2(name = "intro2"))
         sm.add_widget(MainHauptmenüWidget(name = "hauptmenü"))
         sm.add_widget(CreditsWidget(name = "credits"))
         sm.add_widget(OptionenWidget(name = "optionen"))
