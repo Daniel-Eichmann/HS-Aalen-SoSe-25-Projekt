@@ -4,7 +4,7 @@ import serial.tools.list_ports
 import random
 import math
 import time
-import Raspberry 
+from Raspberry import Raspberry
 
 pygame.init()
 
@@ -289,6 +289,10 @@ class Maingame:
 def main():
     maingame = Maingame()
     maingame.run()
+    raspberry = Raspberry()
+    raspberry.get.com_port()
+    raspberry.readline()
+    raspberry.close()
 
 if __name__ =="__main__":
     main()
