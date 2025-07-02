@@ -86,7 +86,6 @@ class Ball:
 
         geschwindigkeit = 5
 
-
         while True:
             winkel = random.uniform(0, 2 * math.pi)
             x = math.cos(winkel)
@@ -133,8 +132,7 @@ class Gegner(Player):
         self.reaktionszeit = 0
         self.zeit_letzte_reaktion = time.time()
         self.reaktions_delay = random.uniform(0.05, 0.3)
-        
-    
+          
     def bewegung(self):
         aktuelle_zeit = time.time()
 
@@ -229,8 +227,7 @@ class Maingame:
         else:
             self.player1.player_bewegung_y = self.tastatur_player1
             self.gegner.player_bewegung_y = self.tastatur_player2
-
-    
+   
     def kollision(self):
         ball_rect = pygame.Rect(self.ball.ball_position_x, self.ball.ball_position_y, self.ball.ball_durchmesser, self.ball.ball_durchmesser)
         player1_rect = pygame.Rect(self.player1.player_position_x, self.player1.player_position_y, self.player1.player_breite, self.player1.player_höhe)
@@ -289,9 +286,6 @@ class Maingame:
                             warten = False
                     except:
                         pass
-
-
-            
             self.spielstand.reset()
             self.ball.reset()
             self.player1.reset()
