@@ -2,6 +2,9 @@ import pygame
 import random
 import sys 
 from collections import deque
+import serial
+import serial.tools.list_ports
+#import highscore_manager 
 titelgröße=30
 ROWS=20
 COLS=20
@@ -14,6 +17,45 @@ SCHWARZ=(0,0,0)
 GRUEN=(0,200,0)
 ROT=(200,0,0)
 GRAU=(200,200,200)
+class Raspberry:
+    def __init__ (self, baudrate=9600, timeout=0.1):
+        self.port = self.get_com_port()
+        self.ser = None 
+        if self.port:
+            try:
+                self.ser = serial.Serial(self.port, baudrate, timeout=timeout)
+            except Exception as e:
+                self.ser = None
+    
+    def get_com_port(self):
+        ports = list(serial.tools.list_ports.comports())
+        com_ports = []
+
+        for p in ports:
+            if p.device.startswith('COM'):
+                try:
+                    num = int(p.device[3:])
+                    com_ports.append((num, p.device))
+                except ValueError:
+                    pass
+        if not com_ports:
+            return None
+        
+        com_ports.sort(key=lambda x: x[0], reverse=True)
+        return com_ports[0][1]
+    
+    def readline(self):
+        if self.ser and self.ser.in_waiting:
+            try:
+                line = self.ser.readline().decode().strip()
+                return line
+            except Exception as e:
+                return None
+        return None
+    
+    def close(self):
+        if self.ser:
+            self.ser.close()
 class Map:
     def __init__(self, rows, cols):
         self.rows=rows
@@ -85,37 +127,104 @@ class Game:
         self.screen=pygame.display.set_mode((BREITE, HOEHE))
         pygame.display.set_caption("Labyrinthspiel")
         self.clock=pygame.time.Clock()
+        self.font=pygame.font.SysFont(None, 40)
         self.map=Map(ROWS, COLS)
         self.spieler=Spieler(self.map)
         self.gegner=Gegner(self.map)
+        self.running=True
+        self.tastatur_player1=(0,0)
+        self.raspberry = Raspberry()
+        self.startzeit=pygame.time.get_ticks()
+        self.lebenszeit=0
     def run(self):
-        while True:
+        while self.running:
             self.clock.tick(FPS)
-            self.events()
+            self.input_handling()
             self.update()
             self.draw()
+        self.game_over()
     def events(self):
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
-                sys.exit
-        keys=pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.spieler.bewegen(-1,0)
-        if keys[pygame.K_RIGHT]:
-            self.spieler.bewegen(1,0)
-        if keys[pygame.K_UP]:
-            self.spieler.bewegen(0,-1)
-        if keys[pygame.K_DOWN]:
-            self.spieler.bewegen(0,1)
+                sys.exit()
+    def input_handling(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                elif event.key == pygame.K_w:
+                    self.tastatur_player1 = (0, -1)
+                elif event.key == pygame.K_s:
+                    self.tastatur_player1 = (0,1)
+                elif event.key == pygame.K_a:
+                    self.tastatur_player1 = (-1,0)
+                elif event.key == pygame.K_d:
+                    self.tastatur_player1 = (1,0)
+            elif event.type == pygame.KEYUP:
+                if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
+                    self.tastatur_player1 = (0,0)
+    
+    def raspberry_input(self):
+        line = self.raspberry.readline()
+        if line:
+            try:
+                w, s, a, d, escape, enter = map(int, line.split(','))
+                dx = -1 if a else (1 if d else 0)
+                dy = -1 if w else (1 if s else 0)
+                self.tastatur_player1=(dx, dy)
+
+                if escape:
+                    self.running = False
+ 
+            except Exception as e:
+                pass
     def update(self):
+        if isinstance(self.tastatur_player1, tuple):
+            dx, dy=self.tastatur_player1
+            self.spieler.bewegen(dx,dy)
         self.gegner.update((self.spieler.x, self.spieler.y))
+        if self.gegner.x==self.spieler.x and self.gegner.y ==self.spieler.y:
+            self.lebenszeit=(pygame.time.get_ticks()-self.startzeit)//1000
+            self.running=False
     def draw(self):
         self.screen.fill(SCHWARZ)
         self.map.draw(self.screen)
         self.spieler.draw(self.screen)
         self.gegner.draw(self.screen)
+        aktuelle_zeit=(pygame.time.get_ticks()-self.startzeit)//1000
+        timertxt=self.font.render(f"Zeit: {aktuelle_zeit}s", True, (255,255,0))
+        self.screen.blit(timertxt, (10, 10))
         pygame.display.flip()
+    def game_over(self):
+        #benutzername=input("Benutzername:")
+        #highscore_manager.speichere_highscore("Labyrinthspiel", benutzername, self.lebenszeit)
+        #print("\nTrophy Highscores:")
+        #for eintrag in highscore_manager.zeige_highscore("Labyrinthspiel"):
+        #    print(f"{eintrag['name']:10}-{eintrag['zeit']}s")
+        self.screen.fill(SCHWARZ)
+        text1=self.font.render("Game Over!", True, ROT)
+        text2=self.font.render(f"Überlebt: {self.lebenszeit} Sekunden", True, WEISS)
+        text3=self.font.render("Zum beenden beliebige Taste drücken...", True, GRAU)
+        self.screen.blit(text1, (BREITE//2-text1.get_width()//2, HOEHE//2-60))
+        self.screen.blit(text2, (BREITE//2-text2.get_width()//2, HOEHE//2))
+        self.screen.blit(text3, (BREITE//2-text3.get_width()//2, HOEHE//2+40))
+        pygame.display.flip()
+        warten=True
+        while warten:
+            for event in pygame.event.get():
+                if event.type==pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type==pygame.KEYDOWN:
+                    warten=False
+        pygame.quit()
+        sys.exit()
+def main():
+    maingame = Game()
+    maingame.run()
 if __name__=="__main__":
     Game().run()
 

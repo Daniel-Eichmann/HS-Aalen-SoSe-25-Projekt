@@ -3,8 +3,16 @@ import sys
 import random
 import os
 import subprocess
+import serial
+import serial.tools.list_ports
 Breite=800
 Höhe=600
+pygame.mixer.init()
+dir_path = os.path.dirname(os.path.realpath(__file__))
+levelxsound = os.path.join(dir_path,"Grafiken", "levelx.mp3")
+pygame.mixer.music.load(levelxsound)
+pygame.mixer.music.set_volume(0.01)
+pygame.mixer.music.play(-1)
 #Farben
 Weiß=(255,255,255)
 Schwarz=(0,0,0)
@@ -110,6 +118,7 @@ class Game:
                 self.speichere_highscore()
                 self.gameover()
                 self.running=False
+        #nur sichtbare Autos updaten
         neueliste=[]
         for hinderniss in self.hinderniss:
             hinderniss.update()
@@ -139,7 +148,7 @@ class Game:
                 f.write(str(self.score))  
     def gameover(self):
         self.screen.fill(Schwarz)
-        gameoveranzeigen=self.font.render("GAME OVER,", True, Rot)
+        gameoveranzeigen=self.font.render("GAME OVER.", True, Rot)
         textposition=gameoveranzeigen.get_rect(center=(Breite//2, Höhe//2))
         self.screen.blit(gameoveranzeigen, textposition)
         pygame.display.flip()
