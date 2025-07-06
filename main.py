@@ -230,7 +230,9 @@ class Highscore(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_highscore = Image(source="GUI_Grafiken\\highscore_placeholder.jpg")
+        hintergrundbild_highscore = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
+        hintergrundbild_highscore.allow_stretch = True
+        hintergrundbild_highscore.keep_ratio = False
         self.add_widget(hintergrundbild_highscore)
 
         self.back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
