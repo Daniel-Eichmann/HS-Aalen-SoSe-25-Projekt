@@ -175,7 +175,15 @@ class Maingame:
         line = self.raspberry.readline()
         if line:
             try:
-                w, s, a, d, escape, enter = map(int, line.split(','))
+                button_names = ["w", "s", "a", "d", "escape", "enter"]
+                pressed_keys = line.strip().split(',') if line.strip() else []
+                values = {key: (key in pressed_keys) for key in button_names}
+                w = values["w"]
+                s = values["s"]
+                a = values["a"]
+                d = values["d"]
+                escape = values["escape"]
+                enter = values["enter"]
                 self.player1.player_bewegung_y = -5 if w else (5 if s else 0)
                 self.gegner.player_bewegung_y = -5 if a else (5 if d else 0)
 
