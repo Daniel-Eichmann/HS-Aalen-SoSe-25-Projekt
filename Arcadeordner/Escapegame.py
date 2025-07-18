@@ -3,7 +3,7 @@ import random
 import sys 
 from collections import deque
 from Raspberry import Raspberry
-#import highscore_manager 
+import highscore_manager2 
 titelgröße=30
 ROWS=20
 COLS=20
@@ -177,11 +177,8 @@ class Game:
         self.screen.blit(timertxt, (10, 10))
         pygame.display.flip()
     def game_over(self):
-        #benutzername=input("Benutzername:")
-        #highscore_manager.speichere_highscore("Labyrinthspiel", benutzername, self.lebenszeit)
-        #print("\nTrophy Highscores:")
-        #for eintrag in highscore_manager.zeige_highscore("Labyrinthspiel"):
-        #    print(f"{eintrag['name']:10}-{eintrag['zeit']}s")
+        highscore_manager2.speichere_highscore(self.lebenszeit)
+        highscore_manager2.zeige_highscores()
         self.screen.fill(SCHWARZ)
         text1=self.font.render("Game Over!", True, ROT)
         text2=self.font.render(f"Überlebt: {self.lebenszeit} Sekunden", True, WEISS)
