@@ -3,13 +3,9 @@ import sys
 import random
 import os
 import subprocess
-<<<<<<< HEAD
 from Raspberry import Raspberry
-=======
-import serial
-import serial.tools.list_ports
 import highscore_manager3
->>>>>>> 5f19864c3948a3f8528a6b02745ea3943ae0ab77
+
 Breite=800
 Höhe=600
 pygame.mixer.init()
@@ -54,13 +50,13 @@ class Spieler:
         self.rect.topleft=(100, start_y)
         self.speed=5
      def bewegen(self, keys):
-        if keys [pygame.K_UP] and self.rect.top >100:
+        if keys [pygame.K_w] and self.rect.top >100:
             self.rect.y-=self.speed
-        if keys[pygame.K_DOWN] and self.rect.bottom<Höhe-100:
+        if keys[pygame.K_s] and self.rect.bottom<Höhe-100:
             self.rect.y+=self.speed
-        if keys [pygame.K_LEFT] and self.rect.left>0:
+        if keys [pygame.K_a] and self.rect.left>0:
             self.rect.x-=self.speed
-        if keys [pygame.K_RIGHT] and self.rect.right<Breite:
+        if keys [pygame.K_d] and self.rect.right<Breite:
             self.rect.x +=self.speed
      def draw(self, screen):
                 screen.blit(self.auto, self.rect)
@@ -161,7 +157,9 @@ class Game:
         self.screen.blit(gameoveranzeigen, textposition)
         pygame.display.flip()
         pygame.time.delay(3000)
-<<<<<<< HEAD
+        highscore_manager3.speichere_autobahn_highscore(self.score)
+        highscore_manager3.zeige_autobahn_highscores()
+
 
     def input_handling(self):
         for event in pygame.event.get():
@@ -211,10 +209,9 @@ class Game:
 def main():
     maingame = Game()
     maingame.run()
-=======
-        highscore_manager3.speichere_autobahn_highscore(self.score)
-        highscore_manager3.speichere_autobahn_highscore()
->>>>>>> 5f19864c3948a3f8528a6b02745ea3943ae0ab77
+
+
+
 if __name__=="__main__":
     Game().run()
 
