@@ -5,6 +5,7 @@ import os
 import subprocess
 import serial
 import serial.tools.list_ports
+import highscore_manager3
 Breite=800
 Höhe=600
 pygame.mixer.init()
@@ -153,6 +154,8 @@ class Game:
         self.screen.blit(gameoveranzeigen, textposition)
         pygame.display.flip()
         pygame.time.delay(3000)
+        highscore_manager3.speichere_autobahn_highscore(self.score)
+        highscore_manager3.speichere_autobahn_highscore()
 if __name__=="__main__":
     Game().run()
 
