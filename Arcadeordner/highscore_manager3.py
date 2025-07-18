@@ -17,4 +17,4 @@ def zeige_autobahn_highscores():
     eintraege=lade_autobahn_highscores()
     print("\nPlace Top 10 Punktezahlen (Autobahnspiel):")
     for i, punktezahl in enumerate(eintraege, start=1):
-        print(f"Top {i}: hat {punktezahl} Punkte erreicht")
+        print(f"Top {i}: hat {punktezahl} Punkte erreicht")#5

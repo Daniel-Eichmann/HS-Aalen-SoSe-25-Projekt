@@ -3,9 +3,9 @@ import sys
 import random
 import os
 import subprocess
-from Raspberry import Raspberry
+import serial
+import serial.tools.list_ports
 import highscore_manager3
-
 Breite=800
 Höhe=600
 pygame.mixer.init()
@@ -50,13 +50,13 @@ class Spieler:
         self.rect.topleft=(100, start_y)
         self.speed=5
      def bewegen(self, keys):
-        if keys [pygame.K_w] and self.rect.top >100:
+        if keys [pygame.K_UP] and self.rect.top >100:
             self.rect.y-=self.speed
-        if keys[pygame.K_s] and self.rect.bottom<Höhe-100:
+        if keys[pygame.K_DOWN] and self.rect.bottom<Höhe-100:
             self.rect.y+=self.speed
-        if keys [pygame.K_a] and self.rect.left>0:
+        if keys [pygame.K_LEFT] and self.rect.left>0:
             self.rect.x-=self.speed
-        if keys [pygame.K_d] and self.rect.right<Breite:
+        if keys [pygame.K_RIGHT] and self.rect.right<Breite:
             self.rect.x +=self.speed
      def draw(self, screen):
                 screen.blit(self.auto, self.rect)
@@ -91,7 +91,6 @@ class Game:
         self.clock=pygame.time.Clock()
         self.background=Hintergrund()
         self.player=Spieler()
-        self.raspberry = Raspberry()
         self.hinderniss=[]
         self.running=True
         self.score=0
@@ -101,8 +100,6 @@ class Game:
         while self.running:
             self.clock.tick(60)
             self.handle_events()
-            self.input_handling()
-            self.raspberry_input()
             self.update()
             self.draw()
         pygame.quit()
@@ -159,59 +156,6 @@ class Game:
         pygame.time.delay(3000)
         highscore_manager3.speichere_autobahn_highscore(self.score)
         highscore_manager3.zeige_autobahn_highscores()
-
-
-    def input_handling(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-                elif event.key == pygame.K_w:
-                    self.tastatur_player1 = (0, -1)
-                elif event.key == pygame.K_s:
-                    self.tastatur_player1 = (0,1)
-                elif event.key == pygame.K_a:
-                    self.tastatur_player1 = (-1,0)
-                elif event.key == pygame.K_d:
-                    self.tastatur_player1 = (1,0)
-            elif event.type == pygame.KEYUP:
-                if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
-                    self.tastatur_player1 = (0,0)
-
-    def raspberry_input(self):
-        line = self.raspberry.readline()
-        if line:
-            try:
-                button_names = ["w", "s", "a", "d", "escape", "enter"]
-                pressed_keys = line.strip().split(',') if line.strip() else []
-                values = {key: (key in pressed_keys) for key in button_names}
-                w = values["w"]
-                s = values["s"]
-                a = values["a"]
-                d = values["d"]
-                escape = values["escape"]
-                enter = values["enter"]
-                dx = -1 if a else (1 if d else 0)
-                dy = -1 if w else (1 if s else 0)
-                self.tastatur_player1 = (dx, dy)
-                if escape:
-                    self.running = False
-                if enter:
-                    pass
- 
-            except Exception as e:
-                return None
-        else:
-            return
-
-def main():
-    maingame = Game()
-    maingame.run()
-
-
-
 if __name__=="__main__":
     Game().run()
 
