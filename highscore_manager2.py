@@ -19,7 +19,7 @@ def zeige_highscores():
     print("\nPlace Top 10 Überlebenszeiten:")
     for i, zeit in enumerate(eintraege, start=1):
         print(f"Top {i}: hat {zeit} Sekunden überlebt")
-if __name__=="__main__":
-    speichere_highscore(30)
-    speichere_highscore(25)
-    zeige_highscores()
+#test if __name__=="__main__":
+#speichere_highscore(30)
+#speichere_highscore(25)
+#zeige_highscores()

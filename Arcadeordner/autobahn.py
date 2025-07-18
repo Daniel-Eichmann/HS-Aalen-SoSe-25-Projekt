@@ -3,7 +3,13 @@ import sys
 import random
 import os
 import subprocess
+<<<<<<< HEAD
 from Raspberry import Raspberry
+=======
+import serial
+import serial.tools.list_ports
+import highscore_manager3
+>>>>>>> 5f19864c3948a3f8528a6b02745ea3943ae0ab77
 Breite=800
 Höhe=600
 pygame.mixer.init()
@@ -155,6 +161,7 @@ class Game:
         self.screen.blit(gameoveranzeigen, textposition)
         pygame.display.flip()
         pygame.time.delay(3000)
+<<<<<<< HEAD
 
     def input_handling(self):
         for event in pygame.event.get():
@@ -204,6 +211,10 @@ class Game:
 def main():
     maingame = Game()
     maingame.run()
+=======
+        highscore_manager3.speichere_autobahn_highscore(self.score)
+        highscore_manager3.speichere_autobahn_highscore()
+>>>>>>> 5f19864c3948a3f8528a6b02745ea3943ae0ab77
 if __name__=="__main__":
     Game().run()
 
