@@ -2,8 +2,7 @@ import pygame
 import random
 import sys 
 from collections import deque
-import serial
-import serial.tools.list_ports
+from Raspberry import Raspberry
 #import highscore_manager 
 titelgröße=30
 ROWS=20
@@ -17,45 +16,7 @@ SCHWARZ=(0,0,0)
 GRUEN=(0,200,0)
 ROT=(200,0,0)
 GRAU=(200,200,200)
-class Raspberry:
-    def __init__ (self, baudrate=9600, timeout=0.1):
-        self.port = self.get_com_port()
-        self.ser = None 
-        if self.port:
-            try:
-                self.ser = serial.Serial(self.port, baudrate, timeout=timeout)
-            except Exception as e:
-                self.ser = None
-    
-    def get_com_port(self):
-        ports = list(serial.tools.list_ports.comports())
-        com_ports = []
 
-        for p in ports:
-            if p.device.startswith('COM'):
-                try:
-                    num = int(p.device[3:])
-                    com_ports.append((num, p.device))
-                except ValueError:
-                    pass
-        if not com_ports:
-            return None
-        
-        com_ports.sort(key=lambda x: x[0], reverse=True)
-        return com_ports[0][1]
-    
-    def readline(self):
-        if self.ser and self.ser.in_waiting:
-            try:
-                line = self.ser.readline().decode().strip()
-                return line
-            except Exception as e:
-                return None
-        return None
-    
-    def close(self):
-        if self.ser:
-            self.ser.close()
 class Map:
     def __init__(self, rows, cols):
         self.rows=rows
@@ -140,6 +101,7 @@ class Game:
         while self.running:
             self.clock.tick(FPS)
             self.input_handling()
+            self.raspberry_input()
             self.update()
             self.draw()
         self.game_over()
@@ -167,20 +129,36 @@ class Game:
                 if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
                     self.tastatur_player1 = (0,0)
     
+
     def raspberry_input(self):
         line = self.raspberry.readline()
         if line:
             try:
-                w, s, a, d, escape, enter = map(int, line.split(','))
+                button_names = ["w", "s", "a", "d", "escape", "enter"]
+                pressed_keys = line.strip().split(',') if line.strip() else []
+                values = {key: (key in pressed_keys) for key in button_names}
+                w = values["w"]
+                s = values["s"]
+                a = values["a"]
+                d = values["d"]
+                escape = values["escape"]
+                enter = values["enter"]
                 dx = -1 if a else (1 if d else 0)
                 dy = -1 if w else (1 if s else 0)
-                self.tastatur_player1=(dx, dy)
-
+                self.tastatur_player1 = (dx, dy)
                 if escape:
                     self.running = False
+                if enter:
+                    pass
  
             except Exception as e:
-                pass
+                return None
+        else:
+            return
+        
+
+
+
     def update(self):
         if isinstance(self.tastatur_player1, tuple):
             dx, dy=self.tastatur_player1
