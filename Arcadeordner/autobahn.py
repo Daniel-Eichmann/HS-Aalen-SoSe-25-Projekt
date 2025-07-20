@@ -3,7 +3,7 @@ import sys
 import random
 import os
 import subprocess
-from Raspberry import Raspberry 
+from utils.Raspberry import Raspberry
 import highscore_manager3
 Höhe=600
 Breite = 800
