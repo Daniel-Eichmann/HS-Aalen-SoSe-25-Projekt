@@ -98,10 +98,13 @@ class Spiel_Starten(FloatLayout):
             pfad_spiel2 = os.path.join(dir_path,"Arcadeordner", "Escapegame.py")                             
             subprocess.run(["python", pfad_spiel2])
 
-        def arcade_pong_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_pong_starten(click):
+            app = App.get_running_app()
+            app.stop_raspberry_input()                                                                      #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel3 = os.path.join(dir_path,"Spiel_Drei", "Pong.py")                             
             subprocess.run(["python", pfad_spiel3])
+            app.start_raspberry_input()
 
 
         self.spiel1 = Button(text ="Autobahn", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
@@ -277,6 +280,7 @@ class ArcadeProjektApp(App):
             self.music.play()
 
         self.raspberry_pi = Raspberry()
+        self._input_event = None
 
         self._last_press_time = {
             "w": 0, "s": 0, "a": 0, "d": 0, "escape": 0, "enter": 0
@@ -297,7 +301,20 @@ class ArcadeProjektApp(App):
         return sm
 
     def _start_raspberry_input_reading(self, dt):
-        Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
+        self.start_raspberry_input()
+
+    def start_raspberry_input(self):
+        if self._input_event is None: # Only schedule if not already scheduled
+            self._input_event = Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
+
+    def stop_raspberry_input(self):
+        if self._input_event:
+            self._input_event.cancel()
+            self._input_event = None
+            # Clear any buffered input from the Raspberry Pi
+            if self.raspberry_pi.ser:
+                self.raspberry_pi.ser.flushInput()
+
     
     def raspberry_input_lesen(self,data):
         if self.raspberry_pi.ser:
