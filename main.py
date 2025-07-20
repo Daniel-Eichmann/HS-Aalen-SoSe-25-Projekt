@@ -14,6 +14,7 @@ import subprocess
 import os
 from Raspberry import Raspberry
 import time
+import json
 
 class MainHauptmenüWidget(Screen):      #Diese Klasse macht aus unseren MainHauptmenü ein Widget, damit es mit dem ScreenManager geändert werden kann!
     def __init__(self, **kwargs):   
@@ -85,7 +86,6 @@ class Spiel_Starten(FloatLayout):
         
         def arcade_autobahn_starten(click):
             app = App.get_running_app()
-            app.stop_raspberry_input()
             if app.music:
                 app.music.volume = 0.0                                                                     #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
@@ -93,15 +93,11 @@ class Spiel_Starten(FloatLayout):
             subprocess.run(["python", pfad_spiel1])
             if app.music:
                 app.music.volume = 0.01
-            app.start_raspberry_input()
 
-        def arcade_escapegame_starten(click):
-            app = App.get_running_app()
-            app.stop_raspberry_input()                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_escapegame_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel2 = os.path.join(dir_path,"Arcadeordner", "Escapegame.py")                             
             subprocess.run(["python", pfad_spiel2])
-            app.start_raspberry_input()
 
         def arcade_pong_starten(click):
             app = App.get_running_app()
@@ -193,6 +189,12 @@ class Optionen(FloatLayout):
         musik_label.pos_hint = {"center_x" : 0.28, "center_y" : 0.5}
         self.add_widget(musik_label)
 
+        unterstrich_label = Label(text = "______",font_size = 100, color = (1,1,1,1))
+        unterstrich_label.size_hint = 0.6, 1
+        unterstrich_label.pos_hint = {"center_x" : 0.28, "center_y" : 0.53}
+        self.add_widget(unterstrich_label)
+        
+
         def musik_wechsel1(instance):
             App.get_running_app().musikauswahl("GUI_Grafiken/hintergrund_musik1.mp3")
         
@@ -238,16 +240,55 @@ class Highscore(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-        hintergrundbild_highscore = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
-        hintergrundbild_highscore.allow_stretch = True
-        hintergrundbild_highscore.keep_ratio = False
-        self.add_widget(hintergrundbild_highscore)
+       # hintergrundbild_highscore = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
+       # hintergrundbild_highscore.allow_stretch = True
+       # hintergrundbild_highscore.keep_ratio = False
+       # self.add_widget(hintergrundbild_highscore)
 
         self.back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         self.back_button.size_hint = 0.3, 0.1
         self.back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
         self.back_button.bind(on_press = back_button_click1)
         self.add_widget(self.back_button)
+
+        autobahn_highscore_label = Label(text = "Autobahnspiel", font_name="GUI_Grafiken\\ka1.ttf", font_size = 23, color = (1,1,1,1))
+        autobahn_highscore_label.size_hint = 0.3, 0.1
+        autobahn_highscore_label.pos_hint = {"center_x" : 0.25, "center_y" : 0.75}
+        self.add_widget(autobahn_highscore_label)
+
+        escapegame_highscore_label = Label(text = "Escapegame", font_name="GUI_Grafiken\\ka1.ttf", font_size = 23, color = (1,1,1,1))
+        escapegame_highscore_label.size_hint = 0.3, 0.1
+        escapegame_highscore_label.pos_hint = {"center_x" : 0.75, "center_y" : 0.75}
+        self.add_widget(escapegame_highscore_label)
+        try:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            DATEI = os.path.join(dir_path,"Arcadeordner", "autobahnspiel.json")
+            with open(DATEI, "r", encoding="utf-8") as f:
+                punkte_liste = json.load(f)
+        except Exception as e:
+            punkte_liste = [f"Fehler beim Laden: {e}"]
+
+
+        pos_y = 0.6
+        for index, punktzahl in enumerate(punkte_liste):
+            label = Label(text=f"{index + 1}. Platz: {punktzahl} Punkte",  font_name="GUI_Grafiken\\ka1.ttf", font_size=15, color=(1, 1, 1, 1), size_hint=(0.8, None), height=30, pos_hint={"center_x": 0.25, "center_y": pos_y})
+            self.add_widget(label)
+            pos_y -= 0.055
+
+        try:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            DATEI = os.path.join(dir_path,"Arcadeordner", "escapegame.json")
+            with open(DATEI, "r", encoding="utf-8") as f:
+                punkte_liste = json.load(f)
+        except Exception as e:
+            punkte_liste = [f"Fehler beim Laden: {e}"]
+
+
+        pos_y = 0.6
+        for index, punktzahl in enumerate(punkte_liste):
+            label = Label(text=f"{index + 1}. Platz: {punktzahl} Punkte",  font_name="GUI_Grafiken\\ka1.ttf", font_size=15, color=(1, 1, 1, 1), size_hint=(0.8, None), height=30, pos_hint={"center_x": 0.75, "center_y": pos_y})
+            self.add_widget(label)
+            pos_y -= 0.055
 
 class Intro1(Screen):
     def __init__(self, **kwargs):
@@ -309,19 +350,16 @@ class ArcadeProjektApp(App):
         self.start_raspberry_input()
 
     def start_raspberry_input(self):
-        if not self.raspberry_pi.ser:
-            self.raspberry_pi = Raspberry()
-        if self._input_event is None:
+        if self._input_event is None: # Only schedule if not already scheduled
             self._input_event = Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
 
     def stop_raspberry_input(self):
         if self._input_event:
             self._input_event.cancel()
             self._input_event = None
-    # 💥 Serielle Verbindung vollständig schließen:
-        if self.raspberry_pi.ser:
-            self.raspberry_pi.ser.close()
-            self.raspberry_pi.ser = None
+            # Clear any buffered input from the Raspberry Pi
+            if self.raspberry_pi.ser:
+                self.raspberry_pi.ser.flushInput()
 
     
     def raspberry_input_lesen(self,data):
