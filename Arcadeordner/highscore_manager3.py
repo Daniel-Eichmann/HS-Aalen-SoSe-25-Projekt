@@ -4,9 +4,12 @@ DATEI=os.path.join(os.path.dirname(__file__), "autobahnspiel.json")
 MAX_EINTRAEGE=10
 def lade_autobahn_highscores():
     if os.path.exists(DATEI):
-        with open(DATEI, "r") as f:
-            return json.load(f)
-        return []
+        try:
+            with open(DATEI, "r") as f:
+                return json.load(f)
+        except:
+            return []
+    return []
 def speichere_autobahn_highscore(score):
     eintraege=lade_autobahn_highscores()
     eintraege.append(score)

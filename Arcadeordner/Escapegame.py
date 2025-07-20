@@ -2,7 +2,7 @@ import pygame
 import random
 import sys 
 from collections import deque
-from utils.Raspberry import Raspberry
+from Raspberry import Raspberry
 import highscore_manager2 
 titelgröße=30
 ROWS=20
