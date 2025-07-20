@@ -3,11 +3,12 @@ import sys
 import random
 import os
 import subprocess
-import serial
-import serial.tools.list_ports
+from Raspberry import Raspberry
 import highscore_manager3
+
 Breite=800
 Höhe=600
+Breite = 800
 pygame.mixer.init()
 dir_path = os.path.dirname(os.path.realpath(__file__))
 levelxsound = os.path.join(dir_path,"Grafiken", "levelx.mp3")
@@ -82,15 +83,17 @@ class Hinderniss:
         self.rect.x-=self.speed
     def draw(self, screen):
         screen.blit(self.auto2, self.rect)
-        pygame.draw.rect(screen,(0,255,0),self.rect, 2)   #Testen des Kollisionsalgorithmus
+        pygame.draw.rect(screen,(0,255,0),self.rect, 2)   
+
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen=pygame.display.set_mode((Breite, Höhe))
+        self.screen = pygame.display.set_mode((Breite, Höhe))
         pygame.display.set_caption("Arcade")
         self.clock=pygame.time.Clock()
         self.background=Hintergrund()
         self.player=Spieler()
+        self.raspberry = Raspberry()
         self.hinderniss=[]
         self.running=True
         self.score=0
@@ -104,58 +107,163 @@ class Game:
             self.draw()
         pygame.quit()
         sys.exit()
+
     def handle_events(self):
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                self.running=False
+            if event.type == pygame.QUIT:
+                self.running = False
+
     def update(self):
-        keys=pygame.key.get_pressed()
-        self.player.bewegen(keys)
-        if random.randint(0, 60)==0:
+        dx, dy = self.verarbeite_input()
+        self.player.rect.x += dx * self.player.speed
+        self.player.rect.y += dy * self.player.speed
+
+
+        if self.player.rect.top < 100:
+            self.player.rect.top = 100
+        if self.player.rect.bottom > Höhe - 100:
+            self.player.rect.bottom = Höhe - 100
+        if self.player.rect.left < 0:
+            self.player.rect.left = 0
+        if self.player.rect.right > Breite:
+            self.player.rect.right = Breite
+
+
+        if random.randint(0, 60) == 0:
             self.hinderniss.append(Hinderniss())
+
+
         for hinderniss in self.hinderniss:
             hinderniss.update()
             if self.player.rect.colliderect(hinderniss.rect):
                 self.speichere_highscore()
                 self.gameover()
-                self.running=False
-        #nur sichtbare Autos updaten
-        neueliste=[]
-        for hinderniss in self.hinderniss:
-            hinderniss.update()
-            if hinderniss.rect.right>0:
-                neueliste.append(hinderniss)
-                self.hinderniss=neueliste
-        self.score+=1
+                self.running = False
+
+
+        self.hinderniss = [h for h in self.hinderniss if h.rect.right > 0]
+        self.score += 1
+
+    def verarbeite_input(self):
+        keys = pygame.key.get_pressed()
+        dx, dy = 0, 0
+
+        if keys[pygame.K_w]:
+            dy -= 1
+        if keys[pygame.K_s]:
+            dy += 1
+        if keys[pygame.K_a]:
+            dx -= 1
+        if keys[pygame.K_d]:
+            dx += 1
+
+
+        line = self.raspberry.readline()
+        if line:
+            try:
+                pressed_keys = line.strip().split(",")
+                if "w" in pressed_keys:
+                    dy -= 1
+                if "s" in pressed_keys:
+                    dy += 1
+                if "a" in pressed_keys:
+                    dx -= 1
+                if "d" in pressed_keys:
+                    dx += 1
+                if "escape" in pressed_keys:
+                    self.running = False
+
+            except Exception as e:
+                print("Fehler beim Verarbeiten des Raspberry-Inputs:", e)
+
+        return dx, dy
+
     def draw(self):
         self.background.draw(self.screen)
         self.player.draw(self.screen)
         for hinderniss in self.hinderniss:
             hinderniss.draw(self.screen)
-        score_anzeigen=self.font.render(f"Score:{self.score}", True, Lila)
-        highscore_anzeigen=self.font.render(f"Highscore:{self.highscore}", True, Neongrün)
-        self.screen.blit(score_anzeigen, (10,10))
-        self.screen.blit(highscore_anzeigen, (10,40))
+
+        score_anzeigen = self.font.render(f"Score: {self.score}", True, Lila)
+        highscore_anzeigen = self.font.render(f"Highscore: {self.highscore}", True, Neongrün)
+        self.screen.blit(score_anzeigen, (10, 10))
+        self.screen.blit(highscore_anzeigen, (10, 40))
         pygame.display.flip()
+
     def lade_highscore(self):
-        try: 
+        try:
             with open("highscore.txt", "r") as f:
                 return int(f.read())
         except:
             return 0
+
     def speichere_highscore(self):
-        if self.score>self.highscore:
+        if self.score > self.highscore:
             with open("highscore.txt", "w") as f:
-                f.write(str(self.score))  
+                f.write(str(self.score))
+
     def gameover(self):
         self.screen.fill(Schwarz)
-        gameoveranzeigen=self.font.render("GAME OVER.", True, Rot)
-        textposition=gameoveranzeigen.get_rect(center=(Breite//2, Höhe//2))
+        gameoveranzeigen = self.font.render("GAME OVER.", True, Rot)
+        textposition = gameoveranzeigen.get_rect(center=(Breite // 2, Höhe // 2))
         self.screen.blit(gameoveranzeigen, textposition)
         pygame.display.flip()
         pygame.time.delay(3000)
         highscore_manager3.speichere_autobahn_highscore(self.score)
         highscore_manager3.zeige_autobahn_highscores()
+
+
+    def input_handling(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                elif event.key == pygame.K_w:
+                    self.tastatur_player1 = (0, -1)
+                elif event.key == pygame.K_s:
+                    self.tastatur_player1 = (0,1)
+                elif event.key == pygame.K_a:
+                    self.tastatur_player1 = (-1,0)
+                elif event.key == pygame.K_d:
+                    self.tastatur_player1 = (1,0)
+            elif event.type == pygame.KEYUP:
+                if event.key in (pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d):
+                    self.tastatur_player1 = (0,0)
+
+    def raspberry_input(self):
+        line = self.raspberry.readline()
+        if line:
+            try:
+                button_names = ["w", "s", "a", "d", "escape", "enter"]
+                pressed_keys = line.strip().split(',') if line.strip() else []
+                values = {key: (key in pressed_keys) for key in button_names}
+                w = values["w"]
+                s = values["s"]
+                a = values["a"]
+                d = values["d"]
+                escape = values["escape"]
+                enter = values["enter"]
+                dx = -1 if a else (1 if d else 0)
+                dy = -1 if w else (1 if s else 0)
+                self.tastatur_player1 = (dx, dy)
+                if escape:
+                    self.running = False
+                if enter:
+                    pass
+ 
+            except Exception as e:
+                return None
+        else:
+            return
+
+def main():
+    maingame = Game()
+    maingame.run()
+
+
+
 if __name__=="__main__":
     Game().run()
 
