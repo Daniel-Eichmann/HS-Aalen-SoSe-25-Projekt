@@ -85,6 +85,7 @@ class Spiel_Starten(FloatLayout):
         
         def arcade_autobahn_starten(click):
             app = App.get_running_app()
+            app.stop_raspberry_input()
             if app.music:
                 app.music.volume = 0.0                                                                     #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
@@ -92,11 +93,15 @@ class Spiel_Starten(FloatLayout):
             subprocess.run(["python", pfad_spiel1])
             if app.music:
                 app.music.volume = 0.01
+            app.start_raspberry_input()
 
-        def arcade_escapegame_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_escapegame_starten(click):
+            app = App.get_running_app()
+            app.stop_raspberry_input()                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel2 = os.path.join(dir_path,"Arcadeordner", "Escapegame.py")                             
             subprocess.run(["python", pfad_spiel2])
+            app.start_raspberry_input()
 
         def arcade_pong_starten(click):
             app = App.get_running_app()
@@ -304,16 +309,19 @@ class ArcadeProjektApp(App):
         self.start_raspberry_input()
 
     def start_raspberry_input(self):
-        if self._input_event is None: # Only schedule if not already scheduled
+        if not self.raspberry_pi.ser:
+            self.raspberry_pi = Raspberry()
+        if self._input_event is None:
             self._input_event = Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
 
     def stop_raspberry_input(self):
         if self._input_event:
             self._input_event.cancel()
             self._input_event = None
-            # Clear any buffered input from the Raspberry Pi
-            if self.raspberry_pi.ser:
-                self.raspberry_pi.ser.flushInput()
+    # 💥 Serielle Verbindung vollständig schließen:
+        if self.raspberry_pi.ser:
+            self.raspberry_pi.ser.close()
+            self.raspberry_pi.ser = None
 
     
     def raspberry_input_lesen(self,data):

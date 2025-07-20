@@ -148,7 +148,7 @@ class Maingame:
         self.tastatur_player1 = 0
         self.tastatur_player2 = 0
         self.running = True
-        #self.raspberry = Raspberry()
+        self.raspberry = Raspberry()
     
     def input_handling(self):
         for event in pygame.event.get():
@@ -177,6 +177,7 @@ class Maingame:
         line = self.raspberry.readline()
         if line:
             try:
+                print("Raspberry Input:", line)
                 button_names = ["w", "s", "a", "d", "escape", "enter"]
                 pressed_keys = line.strip().split(',') if line.strip() else []
                 values = {key: (key in pressed_keys) for key in button_names}
@@ -293,10 +294,10 @@ class Maingame:
 def main():
     maingame = Maingame()
     maingame.run()
-    raspberry = Raspberry()
-    raspberry.get.com_port()
-    raspberry.readline()
-    raspberry.close()
+    #raspberry = Raspberry()
+    #raspberry.get.com_port()
+    #raspberry.readline()
+    #raspberry.close()
 
 if __name__ =="__main__":
     main()
