@@ -4,7 +4,7 @@ import serial.tools.list_ports
 import random
 import math
 import time
-#from Raspberry import Raspberry
+from Raspberry import Raspberry
 
 pygame.init()
 
@@ -173,32 +173,32 @@ class Maingame:
                 if event.key in (pygame.K_a, pygame.K_d):
                     self.tastatur_player2 = 0
     
-    #def raspberry_input(self):
-        #line = self.raspberry.readline()
-       # if line:
-           # try:
-              #  button_names = ["w", "s", "a", "d", "escape", "enter"]
-             #   pressed_keys = line.strip().split(',') if line.strip() else []
-               # values = {key: (key in pressed_keys) for key in button_names}
-              #  w = values["w"]
-              #  s = values["s"]
-               # a = values["a"]
-                #d = values["d"]
-                #escape = values["escape"]
-                #enter = values["enter"]
-                #self.player1.player_bewegung_y = -5 if w else (5 if s else 0)
-                #self.gegner.player_bewegung_y = -5 if a else (5 if d else 0)
+    def raspberry_input(self):
+        line = self.raspberry.readline()
+        if line:
+            try:
+                button_names = ["w", "s", "a", "d", "escape", "enter"]
+                pressed_keys = line.strip().split(',') if line.strip() else []
+                values = {key: (key in pressed_keys) for key in button_names}
+                w = values["w"]
+                s = values["s"]
+                a = values["a"]
+                d = values["d"]
+                escape = values["escape"]
+                enter = values["enter"]
+                self.player1.player_bewegung_y = -5 if w else (5 if s else 0)
+                self.gegner.player_bewegung_y = -5 if a else (5 if d else 0)
 
-                #if escape:
-                 #   self.running = False
-                #if enter:
-                 #   return None
+                if escape:
+                    self.running = False
+                if enter:
+                    return None
  
-#            except Exception as e:
- #               return None
-  #      else:
-   #         self.player1.player_bewegung_y = self.tastatur_player1
-    #        self.gegner.player_bewegung_y = self.tastatur_player2
+            except Exception as e:
+                return None
+        else:
+            self.player1.player_bewegung_y = self.tastatur_player1
+            self.gegner.player_bewegung_y = self.tastatur_player2
    
     def kollision(self):
         ball_rect = pygame.Rect(self.ball.ball_position_x, self.ball.ball_position_y, self.ball.ball_durchmesser, self.ball.ball_durchmesser)
@@ -266,7 +266,7 @@ class Maingame:
     def update(self):
         self.player1.player_bewegung_y = self.tastatur_player1
         self.gegner.player_bewegung_y = self.tastatur_player2
-       # self.raspberry_input()
+        self.raspberry_input()
         self.ball.bewegung()
         self.player1.bewegung()
         self.gegner.bewegung()
@@ -287,16 +287,16 @@ class Maingame:
             self.update()
             self.draw()
             clock.tick(60)
-        #self.raspberry.close()
+        self.raspberry.close()
         pygame.quit()
 
 def main():
     maingame = Maingame()
     maingame.run()
-   # raspberry = Raspberry()
-   # raspberry.get.com_port()
-   # raspberry.readline()
-   # raspberry.close()
+    raspberry = Raspberry()
+    raspberry.get.com_port()
+    raspberry.readline()
+    raspberry.close()
 
 if __name__ =="__main__":
     main()
