@@ -120,7 +120,7 @@ class Spiel_Starten(FloatLayout):
         self.add_widget(self.spiel2)
         self.spiel2.bind(on_press = arcade_escapegame_starten)
 
-        self.spiel3 = Button(text ="Pong", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0]) # Korrigiert: Neuer Button für spiel3
+        self.spiel3 = Button(text ="Pong", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         self.spiel3.size_hint = 0.3, 0.1
         self.spiel3.pos_hint = {"center_x" : 0.28, "center_y" : 0.35}
         self.add_widget(self.spiel3)
@@ -240,11 +240,6 @@ class Highscore(FloatLayout):
         def back_button_click1(click):
             self.parent.manager.current = "hauptmenü"
 
-       # hintergrundbild_highscore = Video(source="Hintergrund_Bild.mp4", state="play", options={"eos":"loop"})
-       # hintergrundbild_highscore.allow_stretch = True
-       # hintergrundbild_highscore.keep_ratio = False
-       # self.add_widget(hintergrundbild_highscore)
-
         self.back_button = Button(text = "BACK", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
         self.back_button.size_hint = 0.3, 0.1
         self.back_button.pos_hint = {"center_x" : 0.9, "center_y" : 0.9}
@@ -268,7 +263,6 @@ class Highscore(FloatLayout):
         except Exception as e:
             punkte_liste = [f"Fehler beim Laden: {e}"]
 
-
         pos_y = 0.6
         for index, punktzahl in enumerate(punkte_liste):
             label = Label(text=f"{index + 1}. Platz: {punktzahl} Punkte",  font_name="GUI_Grafiken\\ka1.ttf", font_size=15, color=(1, 1, 1, 1), size_hint=(0.8, None), height=30, pos_hint={"center_x": 0.25, "center_y": pos_y})
@@ -282,7 +276,6 @@ class Highscore(FloatLayout):
                 punkte_liste = json.load(f)
         except Exception as e:
             punkte_liste = [f"Fehler beim Laden: {e}"]
-
 
         pos_y = 0.6
         for index, punktzahl in enumerate(punkte_liste):
@@ -350,14 +343,13 @@ class ArcadeProjektApp(App):
         self.start_raspberry_input()
 
     def start_raspberry_input(self):
-        if self._input_event is None: # Only schedule if not already scheduled
+        if self._input_event is None:
             self._input_event = Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
 
     def stop_raspberry_input(self):
         if self._input_event:
             self._input_event.cancel()
             self._input_event = None
-            # Clear any buffered input from the Raspberry Pi
             if self.raspberry_pi.ser:
                 self.raspberry_pi.ser.flushInput()
 
@@ -445,11 +437,11 @@ class ArcadeProjektApp(App):
             elif isinstance(current_screen, OptionenWidget):
                 optionen_layout = current_screen.layout
                 
-                if a_pressed and (current_time - self._last_press_time["a"]) > self.DEBOUNCE_DELAY: # Lautstärke leiser
+                if a_pressed and (current_time - self._last_press_time["a"]) > self.DEBOUNCE_DELAY:
                     self._last_press_time["a"] = current_time
                     optionen_layout.lautstärke_slider.value = max(0, optionen_layout.lautstärke_slider.value - 0.1)
                 
-                elif d_pressed and (current_time - self._last_press_time["d"]) > self.DEBOUNCE_DELAY: # Lautstärke lauter
+                elif d_pressed and (current_time - self._last_press_time["d"]) > self.DEBOUNCE_DELAY:
                     self._last_press_time["d"] = current_time
                     optionen_layout.lautstärke_slider.value = min(1, optionen_layout.lautstärke_slider.value + 0.1)
 
