@@ -177,7 +177,7 @@ class Maingame:
         line = self.raspberry.readline()
         if line:
             try:
-                print("Raspberry Input:", line)
+                
                 button_names = ["w", "s", "a", "d", "escape", "enter"]
                 pressed_keys = line.strip().split(',') if line.strip() else []
                 values = {key: (key in pressed_keys) for key in button_names}

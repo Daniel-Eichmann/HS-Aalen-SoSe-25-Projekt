@@ -1,23 +1,31 @@
-import time
-import digitalio
+
 import board
-from adafruit_debouncer import Debouncer
+import digitalio
+import time
+import usb_cdc
 
-def setup_button(pin):
-    io = digitalio.DigitalInOut(pin)
-    io.direction = digitalio.Direction.INPUT
-    io.pull = digitalio.Pull.DOWN
-    return Debouncer(io)
+buttons = {
+    "w": digitalio.DigitalInOut(board.GP5),
+    "s": digitalio.DigitalInOut(board.GP7),
+    "a": digitalio.DigitalInOut(board.GP10),
+    "d": digitalio.DigitalInOut(board.GP12),
+    "escape": digitalio.DigitalInOut(board.GP15),
+    "enter": digitalio.DigitalInOut(board.GP16)
+}
 
-redbutton = setup_button(board.GP16)
-bluebutton = setup_button(board.GP17)
-yellowbutton = setup_button(board.GP18)
-whitebutton = setup_button(board.GP19)
+for btn in buttons.values():
+    btn.direction = digitalio.Direction.INPUT
+    btn.pull = digitalio.Pull.UP
+
+led = digitalio.DigitalInOut(board.GP1)
+led.direction = digitalio.Direction.OUTPUT
+led.value = True
 
 while True:
-    redbutton.update()
-    bluebutton.update()
-    yellowbutton.update()
-    whitebutton.update()
-
-    print("Red button is currently pressed:", redbutton.value)
+    pressed_keys = [key for key, btn in buttons.items() if not btn.value]
+    
+    if pressed_keys:
+        line = ",".join(pressed_keys) + "\n"
+        usb_cdc.data.write(line.encode())
+    
+    time.sleep(0.05)
