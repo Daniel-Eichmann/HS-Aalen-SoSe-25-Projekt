@@ -4,7 +4,7 @@ import serial.tools.list_ports
 import random
 import math
 import time
-from Raspberry import Raspberry
+from utils.Raspberry import Raspberry
 
 pygame.init()
 

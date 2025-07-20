@@ -12,7 +12,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 import subprocess
 import os
-from Raspberry import Raspberry
+from utils.Raspberry import Raspberry
 import time
 
 class MainHauptmenüWidget(Screen):      #Diese Klasse macht aus unseren MainHauptmenü ein Widget, damit es mit dem ScreenManager geändert werden kann!
