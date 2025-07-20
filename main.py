@@ -86,6 +86,7 @@ class Spiel_Starten(FloatLayout):
         
         def arcade_autobahn_starten(click):
             app = App.get_running_app()
+            app.stop_raspberry_input()
             if app.music:
                 app.music.volume = 0.0                                                                     #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
@@ -93,11 +94,15 @@ class Spiel_Starten(FloatLayout):
             subprocess.run(["python", pfad_spiel1])
             if app.music:
                 app.music.volume = 0.01
+            app.start_raspberry_input()
 
-        def arcade_escapegame_starten(click):                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
+        def arcade_escapegame_starten(click):
+            app = App.get_running_app()
+            app.stop_raspberry_input()                                                              #Das hier ist unglaublich wichtig und sehr verwirrend, aber es muss so, weil er sonst die Hardcoded Variante nimmt, und das ist ziemlich shit!
             dir_path = os.path.dirname(os.path.realpath(__file__))                                          #auf jeden Fall nimmt er hier die Working Directory und nicht irgendwie den Gesamtpfad oder so, keine Ahnung was hier abgeht.
             pfad_spiel2 = os.path.join(dir_path,"Arcadeordner", "Escapegame.py")                             
             subprocess.run(["python", pfad_spiel2])
+            app.start_raspberry_input()
 
         def arcade_pong_starten(click):
             app = App.get_running_app()
@@ -120,7 +125,7 @@ class Spiel_Starten(FloatLayout):
         self.add_widget(self.spiel2)
         self.spiel2.bind(on_press = arcade_escapegame_starten)
 
-        self.spiel3 = Button(text ="Pong", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0])
+        self.spiel3 = Button(text ="Pong", font_name="GUI_Grafiken\\ka1.ttf", font_size=23, background_color = [0,0,0,0]) # Korrigiert: Neuer Button für spiel3
         self.spiel3.size_hint = 0.3, 0.1
         self.spiel3.pos_hint = {"center_x" : 0.28, "center_y" : 0.35}
         self.add_widget(self.spiel3)
@@ -343,6 +348,8 @@ class ArcadeProjektApp(App):
         self.start_raspberry_input()
 
     def start_raspberry_input(self):
+        if not self.raspberry_pi.ser:
+            self.raspberry_pi = Raspberry()
         if self._input_event is None:
             self._input_event = Clock.schedule_interval(self.raspberry_input_lesen, 0.1)
 
@@ -350,8 +357,9 @@ class ArcadeProjektApp(App):
         if self._input_event:
             self._input_event.cancel()
             self._input_event = None
-            if self.raspberry_pi.ser:
-                self.raspberry_pi.ser.flushInput()
+        if self.raspberry_pi.ser:
+            self.raspberry_pi.ser.close()
+            self.raspberry_pi.ser = None
 
     
     def raspberry_input_lesen(self,data):
